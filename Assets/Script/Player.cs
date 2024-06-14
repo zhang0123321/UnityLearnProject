@@ -5,13 +5,19 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    //眺的速度
     [SerializeField] private float jumpForce;
+    //x位移速度
     [SerializeField] private float moveSpeed;
+    //角色刚体
     private Rigidbody2D rb;
+    
     private float xInput;
-
     private Animator ani;
+    [SerializeField] private Camera _camera;
+    
     private bool isGrounded;
+    [Header("ground info")]
     [SerializeField] private float groundCheckDistance;
     [SerializeField] private LayerMask whatIsGround;
     
@@ -26,6 +32,11 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (_camera!=null)
+        {
+            _camera.transform.position = new Vector3(transform.position.x,_camera.transform.position.y,_camera.transform.position.z);
+        }
+
         //起点位置，方向，长度，碰撞的层级
         isGrounded = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, whatIsGround);
         xInput = Input.GetAxisRaw("Horizontal");
@@ -48,7 +59,7 @@ public class Player : MonoBehaviour
     /// </summary>
     private void JumpFunc()
     {
-        if (Input.GetKey(KeyCode.Space) && !isGrounded)
+        if (Input.GetKey(KeyCode.Space) && isGrounded)
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
             Debug.Log("jump star");
@@ -61,6 +72,8 @@ public class Player : MonoBehaviour
     private void SetAnimator()
     {
         ani.SetBool("isMoveing", xInput != 0);
+        ani.SetBool("isInGround", isGrounded);
+        ani.SetFloat("yVelocity", rb.velocity.y);
     }
 
     /// <summary>
